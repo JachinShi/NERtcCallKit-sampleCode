@@ -1,0 +1,126 @@
+<html>
+
+<body>
+    <div>
+        呼叫组件简易demo
+        <div>
+        </div>
+        <div id="NE_local" style="display: inline-block;float: left;width:320px; height:240px">本地视图</div>
+        <div id="NE_remote" style="display: inline-block;float: right;width:320px; height:240px">远端视图</div>
+    </div>
+    <script src="./lib/vconsole.min.js"></script>
+    <script src="./lib/NECall_2.2.0.js"></script>
+    <script src="./lib/NIM_Web_NIM_v9.14.4.js"></script>
+    <script>
+        var vConsole = new VConsole();
+        const neCall = NECallSDK.NECall.getInstance();
+        const appKey = "";
+        const account = "";
+        const token = "";
+        const callee = "";
+        function login() {
+            const im = NIM.getInstance({
+                appKey: appKey, // im appkey
+                token: token, // im token
+                account: account, // im account
+                logLevel: 'debug',
+                onconnect: () => {
+                    neCall.setup({
+                        nim: im, // im 实例用户需要先初始化
+                        appkey: appKey, // 应用的 appKey，G2 平台的 appKey
+                        currentUserInfo: { accId: account }, // 当前用户的信息，accId 为 im 的 id, 跟上面的 account 需要一致，uid 为加入RTC的 id。accId 必填； uid 可选：不填系统将自动生成
+                        debug: true, // 是否需要开启日志，默认开启
+                        rtcConfig: {
+                            videoResolution: 'VIDEO_QUALITY.VIDEO_QUALITY_720p',
+                            videoFrameRate: 'VIDEO_FRAME_RATE.CHAT_VIDEO_FRAME_RATE_NORMAL',
+                            audioQuality: 'speech_low_quality',
+                        }, // rtcConfig 用来设置 RTC 可选。相关参数参照 可以参考[G2官方文档](https://doc.yunxin.163.com/docs/jcyOTA0ODM/zUxMDQzOTM?platformId=50082)
+                    })
+                    // 来电监听
+                    neCall.on('onReceiveInvited', (value) => {
+                        // 用户可以触发视图，比如弹起邀请页面
+                        console.log("onReceiveInvited")
+                        console.log(value)
+
+                    })
+                    // 通话结束的回调。通话被取消、拒绝、通话中挂断，即所有导致通话结束的行为都会触发此回调
+                    neCall.on('onCallEnd', (value) => {
+                        console.log("onCallEnd")
+                        console.log(value)
+                    })
+                    // 话单回调
+                    neCall.on('onRecordSend', (value) => {
+                        console.log("onRecordSend")
+                        console.log(value)
+                    })
+                    // 主被叫加入通道的回调，通话建立后触发
+                    neCall.on('onCallConnected', (value) => {
+                        console.log("onCallConnected")
+                        console.log(value)
+                    })
+                    neCall.rtcController.client.on('network-quality', stats => {
+                        console.log('=====房间里所有成员的网络状况：', stats)
+                        let status = null
+                        stats.forEach(item => {
+                            status = 'uid: ' + item.uid + ',上行： ' + item.uplinkNetworkQuality + ',下行： ' + item.downlinkNetworkQuality
+                            console.log(status)
+                        })
+                    })
+
+                    neCall.rtcController.client.on('connection-state-change', evt => {
+                        console.log('=====获取SDK与服务器的连接状态：', evt)
+                    })
+
+                    neCall.rtcController.client.on('peer-online', evt => {
+                        console.log('=====远端用户或主播角色的用户 ID：', evt.uid)
+                    })
+
+                    neCall.rtcController.client.on('unmute-video', evt => {
+                        console.log('=====unmute：', evt)
+                    })
+
+                    neCall.rtcController.client.on('mute-video', evt => {
+                        console.log('=====mute：', evt)
+                    })
+
+                },
+                ondisconnect: () => {
+                    neCall.destroy()
+                },
+            })
+        }
+
+        function call() {
+            // 发起呼叫
+            const localView = document.getElementById('NE_local')
+            const remoteView = document.getElementById('NE_remote')
+            neCall.setLocalView(localView)
+            neCall.setRemoteView(remoteView)
+            neCall.setTimeout(30) // 主叫和被叫均要设置
+            neCall.call({
+                accId: callee, // 被叫 im 的 id
+                callType: '2', //呼叫类型，1表示语音通话，2表示视频通话 
+            })
+        }
+
+        function accept() {
+            // 接受邀请
+            const localView = document.getElementById('NE_local')
+            const remoteView = document.getElementById('NE_remote')
+            neCall.setLocalView(localView)
+            neCall.setRemoteView(remoteView)
+            // 接受邀请，需要先设置视图
+            neCall.accept()
+        }
+
+        function hangup() {
+            // 挂断
+            neCall.hangup()
+        }
+
+        login()
+        setTimeout(() => call(), 1000)
+    </script>
+</body>
+
+</html>

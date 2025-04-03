@@ -1,0 +1,18 @@
+{
+  "name": "vue2-v1",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "@xkit-yx/call-kit": "^2.3.0",
+    "@yxim/nim-web-sdk": "^9.19.2",
+    "vue": "^2.7.16"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "~5.0.0",
+    "vue-template-compiler": "^2.7.16"
+  }
+}

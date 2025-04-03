@@ -1,0 +1,19 @@
+{
+  "name": "vue3-v1",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@xkit-yx/call-kit": "^2.3.0",
+    "@yxim/nim-web-sdk": "^9.19.2",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.4.0",
+    "vite": "^4.4.11"
+  }
+}
